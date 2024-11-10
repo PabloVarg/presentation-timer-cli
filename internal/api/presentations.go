@@ -14,7 +14,6 @@ type Presentation struct {
 }
 
 func GetPresentations(client APIClient, get KeyValueRetriever) ([]Presentation, error) {
-	time.Sleep(5 * time.Second)
 	path, err := url.JoinPath(client.Url(get), "/presentations")
 	if err != nil {
 		return nil, err
