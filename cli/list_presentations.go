@@ -3,25 +3,34 @@ package cli
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type ListPresentations struct {
-	Spinner spinner.Model
 	APIModel
-	APIResponseModel[[]api.Presentation]
+	StyledComponent
+	ListModel[api.Presentation]
 }
 
 func NewListPresentations() ListPresentations {
-	s := spinner.New()
-	s.Spinner = spinner.Points
+	l := NewDefaultList(NewDefaultDelegate())
 
 	return ListPresentations{
-		Spinner: s,
+		ListModel: ListModel[api.Presentation]{
+			list:     &l,
+			itemizer: PresentationItemizer,
+		},
+		StyledComponent: StyledComponent{
+			styles: map[string]lipgloss.Style{
+				"list": lipgloss.
+					NewStyle().
+					Padding(1),
+			},
+		},
 	}
 }
 
@@ -29,60 +38,35 @@ func (m ListPresentations) Init() tea.Cmd {
 	return tea.Batch(func() tea.Msg {
 		result, err := api.GetPresentations(m.api, os.LookupEnv)
 		if err != nil {
-			return err
+			return fmt.Errorf("error loading data %s", err)
 		}
 
 		return result
-	}, m.Spinner.Tick)
+	})
 }
 
 func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	cmds := make([]tea.Cmd, 0)
+
 	switch msg := msg.(type) {
 	case error:
-		m.SetErr(msg)
+		cmds = append(cmds, m.handleError(msg))
 	case []api.Presentation:
-		m.SetData(msg)
-	case tea.KeyMsg:
-		m.handleKeyPress(msg)
-	case spinner.TickMsg:
-		if m.done {
-			return m, nil
-		}
-
-		s, cmd := m.Spinner.Update(msg)
-		m.Spinner = s
-		return m, cmd
+		cmds = append(cmds, m.handleItems(msg...))
+	case tea.WindowSizeMsg:
+		m.list.SetSize(
+			msg.Width-m.styles["list"].GetHorizontalFrameSize(),
+			msg.Height-m.styles["list"].GetVerticalFrameSize(),
+		)
 	}
 
-	return m, nil
+	model, cmd := m.list.Update(msg)
+	m.list = &model
+	cmds = append(cmds, cmd)
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m ListPresentations) View() string {
-	resStyle := lipgloss.
-		NewStyle().
-		Foreground(lipgloss.Color("#00ee00"))
-	errStyle := lipgloss.
-		NewStyle().
-		Foreground(lipgloss.Color("#ee0000"))
-
-	if m.Loading() {
-		return m.Spinner.View()
-	}
-
-	if m.err != nil {
-		return errStyle.Render(m.err.Error())
-	}
-
-	return resStyle.Render(fmt.Sprintf("%+v", m.data))
-}
-
-func (m ListPresentations) handleKeyPress(key tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch key.String() {
-	case "j":
-		log.Println("down")
-	case "k":
-		log.Println("up")
-	}
-
-	return m, nil
+	return m.styles["list"].Render(m.list.View())
 }
