@@ -27,9 +27,7 @@ func NewListPresentations() ListPresentations {
 
 func (m ListPresentations) Init() tea.Cmd {
 	return tea.Batch(func() tea.Msg {
-		result, err := api.GetPresentations(m.api, func(key string) (string, bool) {
-			return "http://localhost:8000", true
-		})
+		result, err := api.GetPresentations(m.api, os.LookupEnv)
 		if err != nil {
 			return err
 		}
