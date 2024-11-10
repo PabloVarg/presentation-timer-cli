@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/cli"
@@ -30,4 +31,11 @@ func readEnv() {
 		"URL of backend",
 	)
 	os.Setenv(api.API_URL_KEY, *url)
+
+	f, err := os.OpenFile("log.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		panic("could not open log file")
+	}
+	log.SetOutput(f)
+	log.SetFlags(log.Ldate | log.Ltime)
 }
