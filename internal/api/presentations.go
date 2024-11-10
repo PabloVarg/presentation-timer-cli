@@ -10,7 +10,8 @@ import (
 )
 
 type Presentation struct {
-	Name string
+	Name     string
+	Duration time.Duration
 }
 
 func GetPresentations(client APIClient, get KeyValueRetriever) ([]Presentation, error) {
