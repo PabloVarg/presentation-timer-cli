@@ -1,27 +1,41 @@
 package cli
 
-import "github.com/PabloVarg/presentation-timer-cli/internal/api"
+import (
+	"time"
+
+	"github.com/PabloVarg/presentation-timer-cli/internal/api"
+	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+type StyledComponent struct {
+	styles map[string]lipgloss.Style
+}
 
 type APIModel struct {
 	api api.APIClient
 }
 
-type APIResponseModel[T any] struct {
-	done bool
-	err  error
-	data T
+type ListModel[T any] struct {
+	list     *list.Model
+	itemizer func([]T) []list.Item
 }
 
-func (m *APIResponseModel[T]) SetErr(err error) {
-	m.done = true
-	m.err = err
+func (l *ListModel[T]) handleError(err error) tea.Cmd {
+	previousLifetime := l.list.StatusMessageLifetime
+
+	l.list.StatusMessageLifetime = 10 * time.Second
+	cmd := l.list.NewStatusMessage(err.Error())
+	l.list.StatusMessageLifetime = previousLifetime
+
+	return cmd
 }
 
-func (m *APIResponseModel[T]) SetData(data T) {
-	m.done = true
-	m.data = data
-}
+func (l *ListModel[T]) handleItems(items ...T) tea.Cmd {
+	cmds := make([]tea.Cmd, 0)
 
-func (m APIResponseModel[T]) Loading() bool {
-	return !m.done
+	cmds = append(cmds, l.list.SetItems(l.itemizer(items)))
+
+	return tea.Batch(cmds...)
 }
