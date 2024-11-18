@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
