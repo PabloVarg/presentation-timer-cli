@@ -72,3 +72,7 @@ func (f *FormModel) updateInputs(msg tea.Msg) tea.Cmd {
 
 	return tea.Batch(cmds...)
 }
+
+func transition(to tea.Model) (tea.Model, tea.Cmd) {
+	return to, to.Init()
+}

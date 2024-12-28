@@ -74,8 +74,7 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "a":
-			nextModel := NewCreatePresentation(m.ProgramModel)
-			return nextModel, nextModel.Init()
+			return transition(NewCreatePresentation(m.ProgramModel))
 		}
 	}
 

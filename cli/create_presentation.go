@@ -45,8 +45,7 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
-			nextModel := NewListPresentations(m.ProgramModel)
-			return nextModel, nextModel.Init()
+			return transition(NewListPresentations(m.ProgramModel))
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {
 				err := api.CreatePresentation(m.api, os.LookupEnv, api.CreatePresentationMsg{
