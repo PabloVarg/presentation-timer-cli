@@ -1,13 +1,17 @@
 package cli
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
+	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type CreatePresentation struct {
+	APIModel
 	StyledComponent
 	FormModel
 }
@@ -36,10 +40,21 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "esc":
+		switch msg.Type {
+		case tea.KeyCtrlC, tea.KeyEsc:
 			nextModel := NewListPresentations()
 			return nextModel, nextModel.Init()
+		case tea.KeyEnter:
+			cmds = append(cmds, func() tea.Msg {
+				err := api.CreatePresentation(m.api, os.LookupEnv, api.CreatePresentationMsg{
+					Name: m.inputs[0].Value(),
+				})
+				if err != nil {
+					return fmt.Errorf("error creating presentation: %s", err)
+				}
+
+				return nil
+			})
 		}
 	}
 

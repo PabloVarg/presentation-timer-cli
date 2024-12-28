@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -34,4 +36,31 @@ func GetPresentations(client APIClient, get KeyValueRetriever) ([]Presentation, 
 	}
 
 	return result.Data, nil
+}
+
+type CreatePresentationMsg struct {
+	Name string `json:"name"`
+}
+
+func CreatePresentation(client APIClient, get KeyValueRetriever, msg CreatePresentationMsg) error {
+	path, err := url.JoinPath(client.Url(get), "/presentations")
+	if err != nil {
+		return err
+	}
+
+	body, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.HTTPClient.Post(path, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	if res.StatusCode != http.StatusCreated {
+		return fmt.Errorf("error creating resource")
+	}
+
+	return nil
 }
