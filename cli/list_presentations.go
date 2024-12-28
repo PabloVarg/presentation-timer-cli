@@ -35,7 +35,7 @@ func NewListPresentations(m ProgramModel) ListPresentations {
 		},
 		StyledComponent: StyledComponent{
 			styles: map[string]lipgloss.Style{
-				"list": listContainerStyle,
+				"list": containerStyle,
 			},
 		},
 	}

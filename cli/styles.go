@@ -10,10 +10,10 @@ var (
 )
 
 var (
-	titleStyle = lipgloss.NewStyle().Foreground(yellow)
+	containerStyle = lipgloss.NewStyle().Padding(1)
+	titleStyle     = lipgloss.NewStyle().Foreground(yellow)
 	// Lists
-	listContainerStyle = lipgloss.NewStyle().Padding(1)
-	listTitleStyle     = lipgloss.NewStyle().Foreground(yellow)
+	listTitleStyle = lipgloss.NewStyle().Foreground(yellow)
 	// Forms
 	textInputFocused = lipgloss.NewStyle().Foreground(fg0)
 )
