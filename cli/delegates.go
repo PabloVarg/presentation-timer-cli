@@ -2,7 +2,6 @@ package cli
 
 import (
 	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func NewDefaultDelegate() list.ItemDelegate {
@@ -10,13 +9,18 @@ func NewDefaultDelegate() list.ItemDelegate {
 
 	d.ShowDescription = true
 
+	d.Styles.NormalTitle = d.Styles.NormalTitle.
+		Foreground(fg0)
+	d.Styles.NormalDesc = d.Styles.NormalDesc.
+		Foreground(blue)
+
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.
-		Foreground(lipgloss.Color("#FABD2F")).
-		BorderForeground(lipgloss.Color("#D79921"))
+		Foreground(yellow).
+		BorderForeground(yellow)
 
 	d.Styles.SelectedDesc = d.Styles.SelectedDesc.
-		Foreground(lipgloss.Color("#D79921")).
-		BorderForeground(lipgloss.Color("#D79921"))
+		Foreground(yellow).
+		BorderForeground(yellow)
 
 	return d
 }

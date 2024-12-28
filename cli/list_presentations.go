@@ -25,9 +25,7 @@ func NewListPresentations() ListPresentations {
 		},
 		StyledComponent: StyledComponent{
 			styles: map[string]lipgloss.Style{
-				"list": lipgloss.
-					NewStyle().
-					Padding(1),
+				"list": listContainerStyle,
 			},
 		},
 	}
@@ -57,6 +55,11 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg.Width-m.styles["list"].GetHorizontalFrameSize(),
 			msg.Height-m.styles["list"].GetVerticalFrameSize(),
 		)
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "a":
+			return CreatePresentation{}, nil
+		}
 	}
 
 	model, cmd := m.list.Update(msg)
