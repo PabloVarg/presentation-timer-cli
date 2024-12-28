@@ -56,7 +56,9 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return fmt.Errorf("error creating presentation: %s", err)
 				}
 
-				return nil
+				return tea.KeyMsg{
+					Type: tea.KeyEsc,
+				}
 			})
 		}
 	}
