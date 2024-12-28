@@ -5,9 +5,17 @@ import (
 	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+var keyMap = []key.Binding{
+	key.NewBinding(
+		key.WithKeys("a"),
+		key.WithHelp("a", "new presentation"),
+	),
+}
 
 type ListPresentations struct {
 	ProgramModel
@@ -17,7 +25,7 @@ type ListPresentations struct {
 }
 
 func NewListPresentations(m ProgramModel) ListPresentations {
-	l := NewDefaultList(NewDefaultDelegate())
+	l := NewDefaultList(NewDefaultDelegate(), keyMap)
 
 	return ListPresentations{
 		ProgramModel: m,
