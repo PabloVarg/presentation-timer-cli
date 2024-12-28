@@ -10,15 +10,17 @@ import (
 )
 
 type ListPresentations struct {
+	ProgramModel
 	APIModel
 	StyledComponent
 	ListModel[api.Presentation]
 }
 
-func NewListPresentations() ListPresentations {
+func NewListPresentations(m ProgramModel) ListPresentations {
 	l := NewDefaultList(NewDefaultDelegate())
 
 	return ListPresentations{
+		ProgramModel: m,
 		ListModel: ListModel[api.Presentation]{
 			list:     &l,
 			itemizer: PresentationItemizer,
@@ -32,6 +34,11 @@ func NewListPresentations() ListPresentations {
 }
 
 func (m ListPresentations) Init() tea.Cmd {
+	m.list.SetSize(
+		m.width-m.styles["list"].GetHorizontalFrameSize(),
+		m.height-m.styles["list"].GetVerticalFrameSize(),
+	)
+
 	return tea.Batch(func() tea.Msg {
 		result, err := api.GetPresentations(m.api, os.LookupEnv)
 		if err != nil {
@@ -44,6 +51,7 @@ func (m ListPresentations) Init() tea.Cmd {
 
 func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, 0)
+	cmds = append(cmds, m.ProgramModel.Update(msg))
 
 	switch msg := msg.(type) {
 	case error:
@@ -52,13 +60,13 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, m.handleItems(msg...))
 	case tea.WindowSizeMsg:
 		m.list.SetSize(
-			msg.Width-m.styles["list"].GetHorizontalFrameSize(),
-			msg.Height-m.styles["list"].GetVerticalFrameSize(),
+			m.width-m.styles["list"].GetHorizontalFrameSize(),
+			m.height-m.styles["list"].GetVerticalFrameSize(),
 		)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "a":
-			nextModel := NewCreatePresentation()
+			nextModel := NewCreatePresentation(m.ProgramModel)
 			return nextModel, nextModel.Init()
 		}
 	}

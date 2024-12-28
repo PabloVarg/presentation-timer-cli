@@ -11,18 +11,20 @@ import (
 )
 
 type CreatePresentation struct {
+	ProgramModel
 	APIModel
 	StyledComponent
 	FormModel
 }
 
-func NewCreatePresentation() CreatePresentation {
+func NewCreatePresentation(m ProgramModel) CreatePresentation {
 	nameInput := textinput.New()
 	nameInput.Placeholder = "Name"
 
 	nameInput.Focus()
 
 	return CreatePresentation{
+		ProgramModel: m,
 		FormModel: FormModel{
 			inputs: []textinput.Model{
 				nameInput,
@@ -37,12 +39,13 @@ func (m CreatePresentation) Init() tea.Cmd {
 
 func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, 0)
+	cmds = append(cmds, m.ProgramModel.Update(msg))
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
-			nextModel := NewListPresentations()
+			nextModel := NewListPresentations(m.ProgramModel)
 			return nextModel, nextModel.Init()
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {

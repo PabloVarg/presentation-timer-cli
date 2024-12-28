@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
@@ -9,6 +10,22 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+type ProgramModel struct {
+	Logger *slog.Logger
+	height int
+	width  int
+}
+
+func (m *ProgramModel) Update(msg tea.Msg) tea.Cmd {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.height = msg.Height
+		m.width = msg.Width
+	}
+
+	return nil
+}
 
 type StyledComponent struct {
 	styles map[string]lipgloss.Style

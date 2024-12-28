@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/cli"
@@ -18,7 +18,14 @@ func main() {
 func run() {
 	readEnv()
 
-	p := tea.NewProgram(cli.NewListPresentations(), tea.WithAltScreen())
+	pm := cli.ProgramModel{
+		Logger: getLogger(),
+	}
+
+	p := tea.NewProgram(
+		cli.NewListPresentations(pm),
+		tea.WithAltScreen(),
+	)
 	if _, err := p.Run(); err != nil {
 		fmt.Fprint(os.Stderr, err)
 	}
@@ -31,11 +38,17 @@ func readEnv() {
 		"URL of backend",
 	)
 	os.Setenv(api.API_URL_KEY, *url)
+}
 
-	f, err := os.OpenFile("log.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+func getLogger() *slog.Logger {
+	f, err := os.OpenFile(
+		"./cli.log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664,
+	)
 	if err != nil {
 		panic("could not open log file")
 	}
-	log.SetOutput(f)
-	log.SetFlags(log.Ldate | log.Ltime)
+
+	return slog.New(slog.NewJSONHandler(f, nil))
 }
