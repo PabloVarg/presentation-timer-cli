@@ -12,5 +12,5 @@ var (
 var (
 	listContainerStyle = lipgloss.NewStyle().Padding(1)
 	listTitleStyle     = lipgloss.NewStyle().Foreground(yellow)
-	textInputFocused   = lipgloss.NewStyle()
+	textInputFocused   = lipgloss.NewStyle().Foreground(fg0)
 )

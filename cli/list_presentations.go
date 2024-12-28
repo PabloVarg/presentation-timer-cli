@@ -58,7 +58,8 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "a":
-			return CreatePresentation{}, nil
+			nextModel := NewCreatePresentation()
+			return nextModel, nextModel.Init()
 		}
 	}
 

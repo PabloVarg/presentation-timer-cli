@@ -5,6 +5,7 @@ import (
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -36,6 +37,21 @@ func (l *ListModel[T]) handleItems(items ...T) tea.Cmd {
 	cmds := make([]tea.Cmd, 0)
 
 	cmds = append(cmds, l.list.SetItems(l.itemizer(items)))
+
+	return tea.Batch(cmds...)
+}
+
+type FormModel struct {
+	focusIndex int
+	inputs     []textinput.Model
+}
+
+func (f *FormModel) updateInputs(msg tea.Msg) tea.Cmd {
+	cmds := make([]tea.Cmd, len(f.inputs))
+
+	for i := range f.inputs {
+		f.inputs[i], cmds[i] = f.inputs[i].Update(msg)
+	}
 
 	return tea.Batch(cmds...)
 }
