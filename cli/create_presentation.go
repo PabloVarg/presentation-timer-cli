@@ -76,5 +76,5 @@ func (m CreatePresentation) View() string {
 		sb.WriteRune('\n')
 	}
 
-	return sb.String()
+	return containerStyle.Render(sb.String())
 }
