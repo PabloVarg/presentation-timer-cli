@@ -81,8 +81,8 @@ func (m CreatePresentation) View() string {
 	}
 
 	if m.err != nil {
-		sb.WriteString(errorStyle.Render(m.err.Error()))
 		sb.WriteRune('\n')
+		sb.WriteString(errorStyle.Render(m.err.Error()))
 	}
 
 	return containerStyle.Render(sb.String())
