@@ -6,6 +6,7 @@ import (
 )
 
 type PresentationItem struct {
+	id       int
 	name     string
 	duration string
 }
@@ -15,6 +16,7 @@ func PresentationItemizer(items []api.Presentation) []list.Item {
 
 	for _, item := range items {
 		result = append(result, PresentationItem{
+			id:       item.ID,
 			name:     item.Name,
 			duration: item.Duration.String(),
 		})

@@ -12,8 +12,9 @@ import (
 )
 
 type Presentation struct {
-	Name     string
-	Duration time.Duration
+	ID       int           `json:"id"`
+	Name     string        `json:"name"`
+	Duration time.Duration `json:"duration"`
 }
 
 func GetPresentations(client APIClient, get KeyValueRetriever) ([]Presentation, error) {
@@ -60,6 +61,30 @@ func CreatePresentation(client APIClient, get KeyValueRetriever, msg CreatePrese
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
+		return ExtractErrorMsg(res.Body)
+	}
+
+	return nil
+}
+
+func DeletePresentation(client APIClient, get KeyValueRetriever, ID int) error {
+	path, err := url.JoinPath(client.Url(get), fmt.Sprintf("/presentations/%d", ID))
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
 		return ExtractErrorMsg(res.Body)
 	}
 

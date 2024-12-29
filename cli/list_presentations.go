@@ -15,6 +15,10 @@ var keyMap = []key.Binding{
 		key.WithKeys("a"),
 		key.WithHelp("a", "new presentation"),
 	),
+	key.NewBinding(
+		key.WithKeys("d"),
+		key.WithHelp("d", "delete presentation"),
+	),
 }
 
 type ListPresentations struct {
@@ -47,14 +51,7 @@ func (m ListPresentations) Init() tea.Cmd {
 		m.height-m.styles["list"].GetVerticalFrameSize(),
 	)
 
-	return tea.Batch(func() tea.Msg {
-		result, err := api.GetPresentations(m.api, os.LookupEnv)
-		if err != nil {
-			return fmt.Errorf("error loading data %s", err)
-		}
-
-		return result
-	})
+	return tea.Batch(m.retrievePresentations())
 }
 
 func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -75,6 +72,8 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "a":
 			return transition(NewCreatePresentation(m.ProgramModel))
+		case "D":
+			cmds = append(cmds, m.deleteSelectedItem())
 		}
 	}
 
@@ -87,4 +86,33 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m ListPresentations) View() string {
 	return m.styles["list"].Render(m.list.View())
+}
+
+func (m ListPresentations) retrievePresentations() tea.Cmd {
+	return func() tea.Msg {
+		result, err := api.GetPresentations(m.api, os.LookupEnv)
+		if err != nil {
+			return fmt.Errorf("error loading data %s", err)
+		}
+
+		return result
+	}
+}
+
+func (m ListPresentations) deleteSelectedItem() tea.Cmd {
+	return tea.Sequence(
+		func() tea.Msg {
+			selectedItem, ok := m.list.SelectedItem().(PresentationItem)
+			if !ok {
+				panic("received unexpected value type")
+			}
+			err := api.DeletePresentation(m.api, os.LookupEnv, selectedItem.id)
+			if err != nil {
+				return fmt.Errorf("could not delete %s", selectedItem.name)
+			}
+
+			return nil
+		},
+		m.retrievePresentations(),
+	)
 }
