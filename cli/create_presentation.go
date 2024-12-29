@@ -17,8 +17,9 @@ type CreatePresentation struct {
 }
 
 func NewCreatePresentation(m ProgramModel) CreatePresentation {
-	nameInput := textinput.New()
-	nameInput.Placeholder = "Name"
+	nameInput := NewDefaultTextInput()
+	nameInput.Placeholder = "My Presentation"
+	nameInput.Prompt = "Name: "
 
 	nameInput.Focus()
 
@@ -72,7 +73,10 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m CreatePresentation) View() string {
 	var sb strings.Builder
 
-	sb.WriteString(titleStyle.Render("Create a Presentation"))
+	sb.WriteString(
+		centeredContainerStyle.Width(m.width).
+			Render(titleStyle.Render("Create a Presentation")),
+	)
 	sb.WriteRune('\n')
 
 	for i := range m.inputs {
