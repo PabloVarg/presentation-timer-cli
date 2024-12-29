@@ -57,9 +57,10 @@ func CreatePresentation(client APIClient, get KeyValueRetriever, msg CreatePrese
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
-		return fmt.Errorf("error creating resource")
+		return ExtractErrorMsg(res.Body)
 	}
 
 	return nil

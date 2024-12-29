@@ -58,9 +58,25 @@ func (l *ListModel[T]) handleItems(items ...T) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
-type FormModel struct {
-	focusIndex int
-	inputs     []textinput.Model
+type (
+	FormError = error
+	FormModel struct {
+		focusIndex int
+		inputs     []textinput.Model
+		err        FormError
+	}
+)
+
+func (f *FormModel) UpdateForm(msg tea.Msg, sendKey tea.KeyType) {
+	switch msg := msg.(type) {
+	case FormError:
+		f.err = msg
+	case tea.KeyMsg:
+		switch msg.Type {
+		default:
+			f.err = nil
+		}
+	}
 }
 
 func (f *FormModel) updateInputs(msg tea.Msg) tea.Cmd {

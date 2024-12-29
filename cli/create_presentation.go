@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -44,7 +43,9 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-		case tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC:
+			return m, tea.Quit
+		case tea.KeyEsc:
 			return transition(NewListPresentations(m.ProgramModel))
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {
@@ -52,7 +53,7 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Name: m.inputs[0].Value(),
 				})
 				if err != nil {
-					return fmt.Errorf("error creating presentation: %s", err)
+					return FormError(err)
 				}
 
 				return tea.KeyMsg{
@@ -61,6 +62,8 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			})
 		}
 	}
+
+	m.UpdateForm(msg, tea.KeyEnter)
 
 	cmds = append(cmds, m.updateInputs(msg))
 	return m, tea.Batch(cmds...)
@@ -74,6 +77,11 @@ func (m CreatePresentation) View() string {
 
 	for i := range m.inputs {
 		sb.WriteString(m.inputs[i].View())
+		sb.WriteRune('\n')
+	}
+
+	if m.err != nil {
+		sb.WriteString(errorStyle.Render(m.err.Error()))
 		sb.WriteRune('\n')
 	}
 
