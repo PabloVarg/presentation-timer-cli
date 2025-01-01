@@ -74,6 +74,8 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return transition(NewCreatePresentation(m.ProgramModel))
 		case "D":
 			cmds = append(cmds, m.deleteSelectedItem())
+		case "R":
+			cmds = append(cmds, m.retrievePresentations())
 		}
 	}
 
