@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -22,13 +23,21 @@ func GetPresentations(client APIClient, get KeyValueRetriever) ([]Presentation, 
 	if err != nil {
 		return nil, err
 	}
+	path += "?page_size=100"
 
 	res, err := client.HTTPClient.Get(path)
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
+
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("request not successful")
+		response, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, fmt.Errorf("%s", string(response))
 	}
 
 	var result PaginatedResponse[[]Presentation]
