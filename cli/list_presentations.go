@@ -16,8 +16,12 @@ var keyMap = []key.Binding{
 		key.WithHelp("a", "new presentation"),
 	),
 	key.NewBinding(
-		key.WithKeys("d"),
-		key.WithHelp("d", "delete presentation"),
+		key.WithKeys("D"),
+		key.WithHelp("D", "delete presentation"),
+	),
+	key.NewBinding(
+		key.WithKeys("R"),
+		key.WithHelp("R", "refresh"),
 	),
 }
 
