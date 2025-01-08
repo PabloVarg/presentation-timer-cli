@@ -66,6 +66,14 @@ func (e FormError) Error() string {
 	return e.err
 }
 
+type FetchError struct {
+	err string
+}
+
+func (e FetchError) Error() string {
+	return e.err
+}
+
 type (
 	FormModel struct {
 		focusIndex int
@@ -77,7 +85,7 @@ type (
 func (f *FormModel) UpdateForm(msg tea.Msg, sendKey tea.KeyType) {
 	switch msg := msg.(type) {
 	case FormError:
-		f.err = msg
+		f.err = &msg
 	case tea.KeyMsg:
 		switch msg.Type {
 		default:

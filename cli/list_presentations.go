@@ -79,6 +79,13 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "D":
 			nextModel := NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel))
 			return nextModel, nextModel.Init()
+		case "c":
+			item, ok := m.list.SelectedItem().(PresentationItem)
+			if !ok {
+				panic("received unexpected value type")
+			}
+
+			return transition(NewEditPresentation(m.ProgramModel, item.id))
 		case "R":
 			cmds = append(cmds, m.retrievePresentations())
 		}
