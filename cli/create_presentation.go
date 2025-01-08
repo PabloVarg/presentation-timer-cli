@@ -54,7 +54,9 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Name: m.inputs[0].Value(),
 				})
 				if err != nil {
-					return FormError(err)
+					return FormError{
+						err: err.Error(),
+					}
 				}
 
 				return tea.KeyMsg{

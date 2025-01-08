@@ -58,12 +58,19 @@ func (l *ListModel[T]) handleItems(items ...T) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+type FormError struct {
+	err string
+}
+
+func (e FormError) Error() string {
+	return e.err
+}
+
 type (
-	FormError = error
 	FormModel struct {
 		focusIndex int
 		inputs     []textinput.Model
-		err        FormError
+		err        *FormError
 	}
 )
 
