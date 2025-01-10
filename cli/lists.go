@@ -9,10 +9,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func NewDefaultList(d list.ItemDelegate, helpKeys []key.Binding) list.Model {
+func NewDefaultList(d list.ItemDelegate, helpKeys []key.Binding, title string) list.Model {
 	l := list.New([]list.Item{}, d, 0, 0)
 
-	l.Title = "Presentations"
+	l.Title = title
 	l.SetShowTitle(true)
 	l.Styles.Title = ListTitleStyle
 

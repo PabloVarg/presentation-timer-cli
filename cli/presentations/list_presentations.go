@@ -34,7 +34,7 @@ type ListPresentations struct {
 }
 
 func NewListPresentations(m cli.ProgramModel) ListPresentations {
-	l := cli.NewDefaultList(cli.NewDefaultDelegate(), keyMap)
+	l := cli.NewDefaultList(cli.NewDefaultDelegate(), keyMap, "Presentations")
 
 	return ListPresentations{
 		ProgramModel: m,
