@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/PabloVarg/presentation-timer-cli/cli/sections"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -81,14 +80,13 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				panic("received unexpected value type")
 			}
 
-			return Transition(sections.NewListSections(m.ProgramModel, item.ID))
+			return Transition(NewListSections(m.ProgramModel, item.ID))
 		}
 		switch msg.String() {
 		case "a":
 			return Transition(NewCreatePresentation(m.ProgramModel))
 		case "D":
-			nextModel := NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel))
-			return nextModel, nextModel.Init()
+			return Transition(NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel)))
 		case "c":
 			item, ok := m.List.SelectedItem().(PresentationItem)
 			if !ok {
