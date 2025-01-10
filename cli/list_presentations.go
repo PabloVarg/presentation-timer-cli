@@ -1,10 +1,10 @@
-package presentations
+package cli
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/PabloVarg/presentation-timer-cli/cli"
+	"github.com/PabloVarg/presentation-timer-cli/cli/sections"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -27,24 +27,24 @@ var keyMap = []key.Binding{
 }
 
 type ListPresentations struct {
-	cli.ProgramModel
-	cli.APIModel
-	cli.StyledComponent
-	cli.ListModel[api.Presentation]
+	ProgramModel
+	APIModel
+	StyledComponent
+	ListModel[api.Presentation]
 }
 
-func NewListPresentations(m cli.ProgramModel) ListPresentations {
-	l := cli.NewDefaultList(cli.NewDefaultDelegate(), keyMap, "Presentations")
+func NewListPresentations(m ProgramModel) ListPresentations {
+	l := NewDefaultList(NewDefaultDelegate(), keyMap, "Presentations")
 
 	return ListPresentations{
 		ProgramModel: m,
-		ListModel: cli.ListModel[api.Presentation]{
+		ListModel: ListModel[api.Presentation]{
 			List:     &l,
-			Itemizer: cli.PresentationItemizer,
+			Itemizer: PresentationItemizer,
 		},
-		StyledComponent: cli.StyledComponent{
+		StyledComponent: StyledComponent{
 			Styles: map[string]lipgloss.Style{
-				"list": cli.ContainerStyle,
+				"list": ContainerStyle,
 			},
 		},
 	}
@@ -74,19 +74,28 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.Height-m.Styles["list"].GetVerticalFrameSize(),
 		)
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "a":
-			return cli.Transition(NewCreatePresentation(m.ProgramModel))
-		case "D":
-			nextModel := cli.NewConfirmationModel(m, m.deleteSelectedItem, cli.WithProgramModel(m.ProgramModel))
-			return nextModel, nextModel.Init()
-		case "c":
-			item, ok := m.List.SelectedItem().(cli.PresentationItem)
+		switch msg.Type {
+		case tea.KeyEnter:
+			item, ok := m.List.SelectedItem().(PresentationItem)
 			if !ok {
 				panic("received unexpected value type")
 			}
 
-			return cli.Transition(NewEditPresentation(m.ProgramModel, item.ID))
+			return Transition(sections.NewListSections(m.ProgramModel, item.ID))
+		}
+		switch msg.String() {
+		case "a":
+			return Transition(NewCreatePresentation(m.ProgramModel))
+		case "D":
+			nextModel := NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel))
+			return nextModel, nextModel.Init()
+		case "c":
+			item, ok := m.List.SelectedItem().(PresentationItem)
+			if !ok {
+				panic("received unexpected value type")
+			}
+
+			return Transition(NewEditPresentation(m.ProgramModel, item.ID))
 		case "R":
 			cmds = append(cmds, m.retrievePresentations())
 		}
@@ -117,7 +126,7 @@ func (m ListPresentations) retrievePresentations() tea.Cmd {
 func (m ListPresentations) deleteSelectedItem() tea.Cmd {
 	return tea.Sequence(
 		func() tea.Msg {
-			selectedItem, ok := m.List.SelectedItem().(cli.PresentationItem)
+			selectedItem, ok := m.List.SelectedItem().(PresentationItem)
 			if !ok {
 				panic("received unexpected value type")
 			}

@@ -1,24 +1,23 @@
-package presentations
+package cli
 
 import (
 	"os"
 	"strings"
 
-	"github.com/PabloVarg/presentation-timer-cli/cli"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type CreatePresentation struct {
-	cli.ProgramModel
-	cli.APIModel
-	cli.StyledComponent
-	cli.FormModel
+	ProgramModel
+	APIModel
+	StyledComponent
+	FormModel
 }
 
-func NewCreatePresentation(m cli.ProgramModel) CreatePresentation {
-	nameInput := cli.NewDefaultTextInput()
+func NewCreatePresentation(m ProgramModel) CreatePresentation {
+	nameInput := NewDefaultTextInput()
 	nameInput.Placeholder = "My Presentation"
 	nameInput.Prompt = "Name: "
 
@@ -26,7 +25,7 @@ func NewCreatePresentation(m cli.ProgramModel) CreatePresentation {
 
 	return CreatePresentation{
 		ProgramModel: m,
-		FormModel: cli.FormModel{
+		FormModel: FormModel{
 			Inputs: []textinput.Model{
 				nameInput,
 			},
@@ -48,14 +47,14 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeyEsc:
-			return cli.Transition(NewListPresentations(m.ProgramModel))
+			return Transition(NewListPresentations(m.ProgramModel))
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {
 				err := api.CreatePresentation(m.Api, os.LookupEnv, api.CreatePresentationMsg{
 					Name: m.Inputs[0].Value(),
 				})
 				if err != nil {
-					return cli.FormError{
+					return FormError{
 						Err: err.Error(),
 					}
 				}
@@ -77,8 +76,8 @@ func (m CreatePresentation) View() string {
 	var sb strings.Builder
 
 	sb.WriteString(
-		cli.CenteredContainerStyle.Width(m.Width).
-			Render(cli.TitleStyle.Render("Create a Presentation")),
+		CenteredContainerStyle.Width(m.Width).
+			Render(TitleStyle.Render("Create a Presentation")),
 	)
 	sb.WriteRune('\n')
 
@@ -89,8 +88,8 @@ func (m CreatePresentation) View() string {
 
 	if m.Err != nil {
 		sb.WriteRune('\n')
-		sb.WriteString(cli.ErrorStyle.Render(m.Err.Error()))
+		sb.WriteString(ErrorStyle.Render(m.Err.Error()))
 	}
 
-	return cli.ContainerStyle.Render(sb.String())
+	return ContainerStyle.Render(sb.String())
 }
