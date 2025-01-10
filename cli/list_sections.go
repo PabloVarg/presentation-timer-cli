@@ -76,6 +76,10 @@ func (m ListSections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.Height-m.Styles["list"].GetVerticalFrameSize(),
 		)
 	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEsc:
+			return Transition(NewListPresentations(m.ProgramModel))
+		}
 		switch msg.String() {
 		case "a":
 			// TODO: Implement
