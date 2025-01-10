@@ -13,97 +13,97 @@ import (
 
 type ProgramModel struct {
 	Logger *slog.Logger
-	height int
-	width  int
+	Height int
+	Width  int
 }
 
 func (m *ProgramModel) Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.height = msg.Height
-		m.width = msg.Width
+		m.Height = msg.Height
+		m.Width = msg.Width
 	}
 
 	return nil
 }
 
 type StyledComponent struct {
-	styles map[string]lipgloss.Style
+	Styles map[string]lipgloss.Style
 }
 
 type APIModel struct {
-	api api.APIClient
+	Api api.APIClient
 }
 
 type ListModel[T any] struct {
-	list     *list.Model
-	itemizer func([]T) []list.Item
+	List     *list.Model
+	Itemizer func([]T) []list.Item
 }
 
-func (l *ListModel[T]) handleError(err error) tea.Cmd {
-	previousLifetime := l.list.StatusMessageLifetime
+func (l *ListModel[T]) HandleError(err error) tea.Cmd {
+	previousLifetime := l.List.StatusMessageLifetime
 
-	l.list.StatusMessageLifetime = 10 * time.Second
-	cmd := l.list.NewStatusMessage(err.Error())
-	l.list.StatusMessageLifetime = previousLifetime
+	l.List.StatusMessageLifetime = 10 * time.Second
+	cmd := l.List.NewStatusMessage(err.Error())
+	l.List.StatusMessageLifetime = previousLifetime
 
 	return cmd
 }
 
-func (l *ListModel[T]) handleItems(items ...T) tea.Cmd {
+func (l *ListModel[T]) HandleItems(items ...T) tea.Cmd {
 	cmds := make([]tea.Cmd, 0)
 
-	cmds = append(cmds, l.list.SetItems(l.itemizer(items)))
+	cmds = append(cmds, l.List.SetItems(l.Itemizer(items)))
 
 	return tea.Batch(cmds...)
 }
 
 type FormError struct {
-	err string
+	Err string
 }
 
 func (e FormError) Error() string {
-	return e.err
+	return e.Err
 }
 
 type FetchError struct {
-	err string
+	Err string
 }
 
 func (e FetchError) Error() string {
-	return e.err
+	return e.Err
 }
 
 type (
 	FormModel struct {
-		focusIndex int
-		inputs     []textinput.Model
-		err        *FormError
+		FocusIndex int
+		Inputs     []textinput.Model
+		Err        *FormError
 	}
 )
 
 func (f *FormModel) UpdateForm(msg tea.Msg, sendKey tea.KeyType) {
 	switch msg := msg.(type) {
 	case FormError:
-		f.err = &msg
+		f.Err = &msg
 	case tea.KeyMsg:
 		switch msg.Type {
 		default:
-			f.err = nil
+			f.Err = nil
 		}
 	}
 }
 
-func (f *FormModel) updateInputs(msg tea.Msg) tea.Cmd {
-	cmds := make([]tea.Cmd, len(f.inputs))
+func (f *FormModel) UpdateInputs(msg tea.Msg) tea.Cmd {
+	cmds := make([]tea.Cmd, len(f.Inputs))
 
-	for i := range f.inputs {
-		f.inputs[i], cmds[i] = f.inputs[i].Update(msg)
+	for i := range f.Inputs {
+		f.Inputs[i], cmds[i] = f.Inputs[i].Update(msg)
 	}
 
 	return tea.Batch(cmds...)
 }
 
-func transition(to tea.Model) (tea.Model, tea.Cmd) {
+func Transition(to tea.Model) (tea.Model, tea.Cmd) {
 	return to, to.Init()
 }

@@ -1,23 +1,24 @@
-package cli
+package presentations
 
 import (
 	"os"
 	"strings"
 
+	"github.com/PabloVarg/presentation-timer-cli/cli"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type CreatePresentation struct {
-	ProgramModel
-	APIModel
-	StyledComponent
-	FormModel
+	cli.ProgramModel
+	cli.APIModel
+	cli.StyledComponent
+	cli.FormModel
 }
 
-func NewCreatePresentation(m ProgramModel) CreatePresentation {
-	nameInput := NewDefaultTextInput()
+func NewCreatePresentation(m cli.ProgramModel) CreatePresentation {
+	nameInput := cli.NewDefaultTextInput()
 	nameInput.Placeholder = "My Presentation"
 	nameInput.Prompt = "Name: "
 
@@ -25,8 +26,8 @@ func NewCreatePresentation(m ProgramModel) CreatePresentation {
 
 	return CreatePresentation{
 		ProgramModel: m,
-		FormModel: FormModel{
-			inputs: []textinput.Model{
+		FormModel: cli.FormModel{
+			Inputs: []textinput.Model{
 				nameInput,
 			},
 		},
@@ -47,15 +48,15 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeyEsc:
-			return transition(NewListPresentations(m.ProgramModel))
+			return cli.Transition(NewListPresentations(m.ProgramModel))
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {
-				err := api.CreatePresentation(m.api, os.LookupEnv, api.CreatePresentationMsg{
-					Name: m.inputs[0].Value(),
+				err := api.CreatePresentation(m.Api, os.LookupEnv, api.CreatePresentationMsg{
+					Name: m.Inputs[0].Value(),
 				})
 				if err != nil {
-					return FormError{
-						err: err.Error(),
+					return cli.FormError{
+						Err: err.Error(),
 					}
 				}
 
@@ -68,7 +69,7 @@ func (m CreatePresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	m.UpdateForm(msg, tea.KeyEnter)
 
-	cmds = append(cmds, m.updateInputs(msg))
+	cmds = append(cmds, m.UpdateInputs(msg))
 	return m, tea.Batch(cmds...)
 }
 
@@ -76,20 +77,20 @@ func (m CreatePresentation) View() string {
 	var sb strings.Builder
 
 	sb.WriteString(
-		centeredContainerStyle.Width(m.width).
-			Render(titleStyle.Render("Create a Presentation")),
+		cli.CenteredContainerStyle.Width(m.Width).
+			Render(cli.TitleStyle.Render("Create a Presentation")),
 	)
 	sb.WriteRune('\n')
 
-	for i := range m.inputs {
-		sb.WriteString(m.inputs[i].View())
+	for i := range m.Inputs {
+		sb.WriteString(m.Inputs[i].View())
 		sb.WriteRune('\n')
 	}
 
-	if m.err != nil {
+	if m.Err != nil {
 		sb.WriteRune('\n')
-		sb.WriteString(errorStyle.Render(m.err.Error()))
+		sb.WriteString(cli.ErrorStyle.Render(m.Err.Error()))
 	}
 
-	return containerStyle.Render(sb.String())
+	return cli.ContainerStyle.Render(sb.String())
 }

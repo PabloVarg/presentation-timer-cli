@@ -10,17 +10,17 @@ func NewDefaultDelegate() list.ItemDelegate {
 	d.ShowDescription = true
 
 	d.Styles.NormalTitle = d.Styles.NormalTitle.
-		Foreground(fg0)
+		Foreground(Fg0)
 	d.Styles.NormalDesc = d.Styles.NormalDesc.
-		Foreground(blue)
+		Foreground(Blue)
 
 	d.Styles.SelectedTitle = d.Styles.SelectedTitle.
-		Foreground(yellow).
-		BorderForeground(yellow)
+		Foreground(Yellow).
+		BorderForeground(Yellow)
 
 	d.Styles.SelectedDesc = d.Styles.SelectedDesc.
-		Foreground(yellow).
-		BorderForeground(yellow)
+		Foreground(Yellow).
+		BorderForeground(Yellow)
 
 	return d
 }

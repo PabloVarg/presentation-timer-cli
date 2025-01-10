@@ -1,19 +1,20 @@
-package cli
+package presentations
 
 import (
 	"os"
 	"strings"
 
+	"github.com/PabloVarg/presentation-timer-cli/cli"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type EditPresentation struct {
-	ProgramModel
-	APIModel
-	StyledComponent
-	FormModel
+	cli.ProgramModel
+	cli.APIModel
+	cli.StyledComponent
+	cli.FormModel
 
 	isLoading      bool
 	PresentationID int
@@ -23,8 +24,8 @@ var editPresentationInputs = map[string]int{
 	"name": 0,
 }
 
-func NewEditPresentation(m ProgramModel, ID int) EditPresentation {
-	nameInput := NewDefaultTextInput()
+func NewEditPresentation(m cli.ProgramModel, ID int) EditPresentation {
+	nameInput := cli.NewDefaultTextInput()
 	nameInput.Placeholder = "My Presentation"
 	nameInput.Prompt = "Name: "
 
@@ -33,8 +34,8 @@ func NewEditPresentation(m ProgramModel, ID int) EditPresentation {
 	return EditPresentation{
 		PresentationID: ID,
 		ProgramModel:   m,
-		FormModel: FormModel{
-			inputs: []textinput.Model{
+		FormModel: cli.FormModel{
+			Inputs: []textinput.Model{
 				nameInput,
 			},
 		},
@@ -47,10 +48,10 @@ func (m EditPresentation) Init() tea.Cmd {
 	return tea.Batch(
 		textinput.Blink,
 		func() tea.Msg {
-			p, err := api.GetPresentation(m.api, os.LookupEnv, m.PresentationID)
+			p, err := api.GetPresentation(m.Api, os.LookupEnv, m.PresentationID)
 			if err != nil {
-				return FetchError{
-					err: err.Error(),
+				return cli.FetchError{
+					Err: err.Error(),
 				}
 			}
 
@@ -65,25 +66,25 @@ func (m EditPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case api.Presentation:
-		m.inputs[editPresentationInputs["name"]].SetValue(msg.Name)
+		m.Inputs[editPresentationInputs["name"]].SetValue(msg.Name)
 		m.isLoading = false
-	case FetchError:
-		m.inputs = nil
+	case cli.FetchError:
+		m.Inputs = nil
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeyEsc:
-			return transition(NewListPresentations(m.ProgramModel))
+			return cli.Transition(NewListPresentations(m.ProgramModel))
 		case tea.KeyEnter:
 			cmds = append(cmds, func() tea.Msg {
-				err := api.UpdatePresentation(m.api, os.LookupEnv, api.EditPresentationMsg{
+				err := api.UpdatePresentation(m.Api, os.LookupEnv, api.EditPresentationMsg{
 					ID:   m.PresentationID,
-					Name: m.inputs[editPresentationInputs["name"]].Value(),
+					Name: m.Inputs[editPresentationInputs["name"]].Value(),
 				})
 				if err != nil {
-					return FormError{
-						err: err.Error(),
+					return cli.FormError{
+						Err: err.Error(),
 					}
 				}
 				return tea.KeyMsg{
@@ -95,7 +96,7 @@ func (m EditPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	m.UpdateForm(msg, tea.KeyEnter)
 
-	cmds = append(cmds, m.updateInputs(msg))
+	cmds = append(cmds, m.UpdateInputs(msg))
 	return m, tea.Batch(cmds...)
 }
 
@@ -103,20 +104,20 @@ func (m EditPresentation) View() string {
 	var sb strings.Builder
 
 	sb.WriteString(
-		centeredContainerStyle.Width(m.width).
-			Render(titleStyle.Render("Edit Presentation")),
+		cli.CenteredContainerStyle.Width(m.Width).
+			Render(cli.TitleStyle.Render("Edit Presentation")),
 	)
 	sb.WriteRune('\n')
 
-	for i := range m.inputs {
-		sb.WriteString(m.inputs[i].View())
+	for i := range m.Inputs {
+		sb.WriteString(m.Inputs[i].View())
 		sb.WriteRune('\n')
 	}
 
-	if m.err != nil {
+	if m.Err != nil {
 		sb.WriteRune('\n')
-		sb.WriteString(errorStyle.Render(m.err.Error()))
+		sb.WriteString(cli.ErrorStyle.Render(m.Err.Error()))
 	}
 
-	return containerStyle.Render(sb.String())
+	return cli.ContainerStyle.Render(sb.String())
 }

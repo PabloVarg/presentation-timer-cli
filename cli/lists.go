@@ -14,7 +14,7 @@ func NewDefaultList(d list.ItemDelegate, helpKeys []key.Binding) list.Model {
 
 	l.Title = "Presentations"
 	l.SetShowTitle(true)
-	l.Styles.Title = listTitleStyle
+	l.Styles.Title = ListTitleStyle
 
 	l.SetSpinner(spinner.Dot)
 	l.Styles.Spinner = l.Styles.Spinner.Foreground(lipgloss.Color("#00ee00"))

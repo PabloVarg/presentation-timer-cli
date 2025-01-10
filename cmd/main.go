@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/PabloVarg/presentation-timer-cli/cli"
+	"github.com/PabloVarg/presentation-timer-cli/cli/presentations"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -23,7 +24,7 @@ func run() {
 	}
 
 	p := tea.NewProgram(
-		cli.NewListPresentations(pm),
+		presentations.NewListPresentations(pm),
 		tea.WithAltScreen(),
 	)
 	if _, err := p.Run(); err != nil {

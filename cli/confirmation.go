@@ -31,15 +31,15 @@ func NewConfirmationModel(
 	}
 
 	m.StyledComponent = StyledComponent{
-		styles: map[string]lipgloss.Style{
+		Styles: map[string]lipgloss.Style{
 			"layout": lipgloss.NewStyle().
-				Width(m.ProgramModel.width).
-				Height(m.ProgramModel.height).
+				Width(m.ProgramModel.Width).
+				Height(m.ProgramModel.Height).
 				Align(lipgloss.Center, lipgloss.Bottom),
 			"container": lipgloss.NewStyle().
-				Width(m.ProgramModel.width/2).
+				Width(m.ProgramModel.Width/2).
 				Border(lipgloss.RoundedBorder(), true).
-				BorderForeground(red).
+				BorderForeground(Red).
 				Align(lipgloss.Center).
 				MarginBottom(5).
 				Padding(1),
@@ -92,8 +92,8 @@ func (m ConfirmationModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m ConfirmationModel) View() string {
 	var sb strings.Builder
 
-	sb.WriteString(titleStyle.Render("Confirm action\n"))
-	sb.WriteString(m.styles["content"].Render("(Y)es (N)o"))
+	sb.WriteString(TitleStyle.Render("Confirm action\n"))
+	sb.WriteString(m.Styles["content"].Render("(Y)es (N)o"))
 
-	return m.styles["layout"].Render(m.styles["container"].Render(sb.String()))
+	return m.Styles["layout"].Render(m.Styles["container"].Render(sb.String()))
 }

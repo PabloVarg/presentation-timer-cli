@@ -1,9 +1,10 @@
-package cli
+package presentations
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/PabloVarg/presentation-timer-cli/cli"
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -26,33 +27,33 @@ var keyMap = []key.Binding{
 }
 
 type ListPresentations struct {
-	ProgramModel
-	APIModel
-	StyledComponent
-	ListModel[api.Presentation]
+	cli.ProgramModel
+	cli.APIModel
+	cli.StyledComponent
+	cli.ListModel[api.Presentation]
 }
 
-func NewListPresentations(m ProgramModel) ListPresentations {
-	l := NewDefaultList(NewDefaultDelegate(), keyMap)
+func NewListPresentations(m cli.ProgramModel) ListPresentations {
+	l := cli.NewDefaultList(cli.NewDefaultDelegate(), keyMap)
 
 	return ListPresentations{
 		ProgramModel: m,
-		ListModel: ListModel[api.Presentation]{
-			list:     &l,
-			itemizer: PresentationItemizer,
+		ListModel: cli.ListModel[api.Presentation]{
+			List:     &l,
+			Itemizer: cli.PresentationItemizer,
 		},
-		StyledComponent: StyledComponent{
-			styles: map[string]lipgloss.Style{
-				"list": containerStyle,
+		StyledComponent: cli.StyledComponent{
+			Styles: map[string]lipgloss.Style{
+				"list": cli.ContainerStyle,
 			},
 		},
 	}
 }
 
 func (m ListPresentations) Init() tea.Cmd {
-	m.list.SetSize(
-		m.width-m.styles["list"].GetHorizontalFrameSize(),
-		m.height-m.styles["list"].GetVerticalFrameSize(),
+	m.List.SetSize(
+		m.Width-m.Styles["list"].GetHorizontalFrameSize(),
+		m.Height-m.Styles["list"].GetVerticalFrameSize(),
 	)
 
 	return tea.Batch(m.retrievePresentations())
@@ -64,47 +65,47 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case error:
-		cmds = append(cmds, m.handleError(msg))
+		cmds = append(cmds, m.HandleError(msg))
 	case []api.Presentation:
-		cmds = append(cmds, m.handleItems(msg...))
+		cmds = append(cmds, m.HandleItems(msg...))
 	case tea.WindowSizeMsg:
-		m.list.SetSize(
-			m.width-m.styles["list"].GetHorizontalFrameSize(),
-			m.height-m.styles["list"].GetVerticalFrameSize(),
+		m.List.SetSize(
+			m.Width-m.Styles["list"].GetHorizontalFrameSize(),
+			m.Height-m.Styles["list"].GetVerticalFrameSize(),
 		)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "a":
-			return transition(NewCreatePresentation(m.ProgramModel))
+			return cli.Transition(NewCreatePresentation(m.ProgramModel))
 		case "D":
-			nextModel := NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel))
+			nextModel := cli.NewConfirmationModel(m, m.deleteSelectedItem, cli.WithProgramModel(m.ProgramModel))
 			return nextModel, nextModel.Init()
 		case "c":
-			item, ok := m.list.SelectedItem().(PresentationItem)
+			item, ok := m.List.SelectedItem().(cli.PresentationItem)
 			if !ok {
 				panic("received unexpected value type")
 			}
 
-			return transition(NewEditPresentation(m.ProgramModel, item.id))
+			return cli.Transition(NewEditPresentation(m.ProgramModel, item.ID))
 		case "R":
 			cmds = append(cmds, m.retrievePresentations())
 		}
 	}
 
-	model, cmd := m.list.Update(msg)
-	m.list = &model
+	model, cmd := m.List.Update(msg)
+	m.List = &model
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
 }
 
 func (m ListPresentations) View() string {
-	return m.styles["list"].Render(m.list.View())
+	return m.Styles["list"].Render(m.List.View())
 }
 
 func (m ListPresentations) retrievePresentations() tea.Cmd {
 	return func() tea.Msg {
-		result, err := api.GetPresentations(m.api, os.LookupEnv)
+		result, err := api.GetPresentations(m.Api, os.LookupEnv)
 		if err != nil {
 			return fmt.Errorf("error loading data %s", err)
 		}
@@ -116,13 +117,13 @@ func (m ListPresentations) retrievePresentations() tea.Cmd {
 func (m ListPresentations) deleteSelectedItem() tea.Cmd {
 	return tea.Sequence(
 		func() tea.Msg {
-			selectedItem, ok := m.list.SelectedItem().(PresentationItem)
+			selectedItem, ok := m.List.SelectedItem().(cli.PresentationItem)
 			if !ok {
 				panic("received unexpected value type")
 			}
-			err := api.DeletePresentation(m.api, os.LookupEnv, selectedItem.id)
+			err := api.DeletePresentation(m.Api, os.LookupEnv, selectedItem.ID)
 			if err != nil {
-				return fmt.Errorf("could not delete %s", selectedItem.name)
+				return fmt.Errorf("could not delete %s", selectedItem.Name)
 			}
 
 			return nil

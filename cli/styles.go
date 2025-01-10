@@ -3,26 +3,26 @@ package cli
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	yellow      = lipgloss.Color("#d8a657")
-	green       = lipgloss.Color("#a9b665")
-	orange      = lipgloss.Color("#e78a4e")
-	blue        = lipgloss.Color("#7daea3")
-	red         = lipgloss.Color("#ea6962")
-	bg_diff_red = lipgloss.Color("#3c1f1e")
-	fg0         = lipgloss.Color("#d4be98")
-	fg1         = lipgloss.Color("#ddc7a1")
+	Yellow      = lipgloss.Color("#d8a657")
+	Green       = lipgloss.Color("#a9b665")
+	Orange      = lipgloss.Color("#e78a4e")
+	Blue        = lipgloss.Color("#7daea3")
+	Red         = lipgloss.Color("#ea6962")
+	Bg_diff_red = lipgloss.Color("#3c1f1e")
+	Fg0         = lipgloss.Color("#d4be98")
+	Fg1         = lipgloss.Color("#ddc7a1")
 )
 
 var (
-	containerStyle         = lipgloss.NewStyle().Padding(1)
-	centeredContainerStyle = lipgloss.NewStyle().Align(lipgloss.Center).Padding(1)
-	titleStyle             = lipgloss.NewStyle().Foreground(yellow)
-	errorStyle             = lipgloss.NewStyle().Foreground(red).Background(bg_diff_red).Padding(1)
+	ContainerStyle         = lipgloss.NewStyle().Padding(1)
+	CenteredContainerStyle = lipgloss.NewStyle().Align(lipgloss.Center).Padding(1)
+	TitleStyle             = lipgloss.NewStyle().Foreground(Yellow)
+	ErrorStyle             = lipgloss.NewStyle().Foreground(Red).Background(Bg_diff_red).Padding(1)
 	// Lists
-	listTitleStyle = lipgloss.NewStyle().Foreground(yellow)
+	ListTitleStyle = lipgloss.NewStyle().Foreground(Yellow)
 	// Forms
-	promptStyle           = lipgloss.NewStyle().Foreground(green)
-	textInputStyle        = lipgloss.NewStyle().Foreground(fg0)
-	textInputFocusedStyle = lipgloss.NewStyle().Foreground(fg1)
-	cursorStyle           = lipgloss.NewStyle().Foreground(fg0)
+	PromptStyle           = lipgloss.NewStyle().Foreground(Green)
+	TextInputStyle        = lipgloss.NewStyle().Foreground(Fg0)
+	TextInputFocusedStyle = lipgloss.NewStyle().Foreground(Fg1)
+	CursorStyle           = lipgloss.NewStyle().Foreground(Fg0)
 )
