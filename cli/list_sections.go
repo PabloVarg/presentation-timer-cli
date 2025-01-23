@@ -82,7 +82,7 @@ func (m ListSections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		switch msg.String() {
 		case "a":
-			// TODO: Implement
+			return Transition(NewCreateSection(m.ProgramModel, m.presentationID))
 		case "D":
 			return Transition(NewConfirmationModel(m, m.deleteSelectedItem, WithProgramModel(m.ProgramModel)))
 		case "c":

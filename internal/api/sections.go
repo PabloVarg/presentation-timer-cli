@@ -82,8 +82,9 @@ func GetSection(client APIClient, get KeyValueRetriever, ID int) (Section, error
 }
 
 type CreateSectionMsg struct {
-	PresentationID int    `json:"-"`
-	Name           string `json:"name"`
+	PresentationID int           `json:"-"`
+	Name           string        `json:"name"`
+	Duration       time.Duration `json:"duration"`
 }
 
 func CreateSection(client APIClient, get KeyValueRetriever, msg CreateSectionMsg) error {

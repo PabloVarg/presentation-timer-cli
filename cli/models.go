@@ -104,6 +104,43 @@ func (f *FormModel) UpdateInputs(msg tea.Msg) tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+func (f *FormModel) UpdateFocus(msg tea.Msg) tea.Cmd {
+	cmds := make([]tea.Cmd, 0, 1)
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "tab", "shift+tab", "up", "down":
+			s := msg.String()
+
+			// Cycle indexes
+			if s == "up" || s == "shift+tab" {
+				f.FocusIndex--
+			} else {
+				f.FocusIndex++
+			}
+
+			if f.FocusIndex > len(f.Inputs) {
+				f.FocusIndex = 0
+			} else if f.FocusIndex < 0 {
+				f.FocusIndex = len(f.Inputs)
+			}
+
+			for i := 0; i <= len(f.Inputs)-1; i++ {
+				if i == f.FocusIndex {
+					// Set focused state
+					cmds = append(cmds, f.Inputs[i].Focus())
+					continue
+				}
+				// Remove focused state
+				f.Inputs[i].Blur()
+			}
+		}
+	}
+
+	return tea.Batch(cmds...)
+}
+
 func Transition(to tea.Model) (tea.Model, tea.Cmd) {
 	return to, to.Init()
 }
