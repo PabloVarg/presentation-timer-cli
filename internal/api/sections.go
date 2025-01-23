@@ -115,8 +115,9 @@ func CreateSection(client APIClient, get KeyValueRetriever, msg CreateSectionMsg
 }
 
 type EditSectionMsg struct {
-	ID   int    `json:"-"`
-	Name string `json:"name"`
+	ID       int           `json:"-"`
+	Name     string        `json:"name"`
+	Duration time.Duration `json:"duration"`
 }
 
 func UpdateSection(
@@ -134,7 +135,7 @@ func UpdateSection(
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, path, bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPatch, path, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
