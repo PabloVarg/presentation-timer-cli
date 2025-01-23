@@ -26,7 +26,7 @@ var createSectionInputs = map[string]int{
 
 func NewCreateSection(m ProgramModel, presentationID int) CreateSection {
 	nameInput := NewDefaultTextInput()
-	nameInput.Placeholder = "My Presentation"
+	nameInput.Placeholder = "My Section"
 	nameInput.Prompt = "Name: "
 
 	durationInput := NewDefaultTextInput()
