@@ -92,6 +92,13 @@ func (m ListSections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			return Transition(NewEditSection(m.ProgramModel, m.presentationID, item.ID))
+		case "m":
+			item, ok := m.List.SelectedItem().(SectionItem)
+			if !ok {
+				panic("received unexpected value type")
+			}
+
+			return Transition(NewMoveSection(m.ProgramModel, m.presentationID, item.ID))
 		case "R":
 			cmds = append(cmds, m.retrieveSections())
 		}
