@@ -176,3 +176,35 @@ func DeleteSection(client APIClient, get KeyValueRetriever, ID int) error {
 
 	return nil
 }
+
+type MoveSectionMsg struct {
+	SectionID int `json:"-"`
+	Move      int `json:"move"`
+}
+
+func MoveSection(client APIClient, get KeyValueRetriever, msg MoveSectionMsg) error {
+	path, err := url.JoinPath(
+		client.Url(get),
+		fmt.Sprintf("/sections/%d/move", msg.SectionID),
+	)
+	if err != nil {
+		return err
+	}
+
+	body, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.HTTPClient.Post(path, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return ExtractErrorMsg(res.Body)
+	}
+
+	return nil
+}
