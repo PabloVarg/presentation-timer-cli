@@ -82,6 +82,10 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return Transition(NewListSections(m.ProgramModel, item.ID))
 		}
+
+		if m.List.FilteringEnabled() {
+			break
+		}
 		switch msg.String() {
 		case "a":
 			return Transition(NewCreatePresentation(m.ProgramModel))

@@ -80,6 +80,10 @@ func (m ListSections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEsc:
 			return Transition(NewListPresentations(m.ProgramModel))
 		}
+
+		if m.List.FilteringEnabled() {
+			break
+		}
 		switch msg.String() {
 		case "a":
 			return Transition(NewCreateSection(m.ProgramModel, m.presentationID))
