@@ -6,6 +6,7 @@ import (
 
 	"github.com/PabloVarg/presentation-timer-cli/internal/api"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -81,7 +82,7 @@ func (m ListSections) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return Transition(NewListPresentations(m.ProgramModel))
 		}
 
-		if m.List.FilteringEnabled() {
+		if m.List.FilterState() == list.Filtering {
 			break
 		}
 		switch msg.String() {
