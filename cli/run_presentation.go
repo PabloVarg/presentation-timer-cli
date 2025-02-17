@@ -125,10 +125,10 @@ func (m RunPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc":
+			m.cancelCtx()
 			if err := m.websocketConn.Close(); err != nil {
 				m.Logger.Info("error closing ws")
 			}
-			m.cancelCtx()
 			return Transition(NewListPresentations(m.ProgramModel))
 		case "s":
 			m.Logger.Info("reached before send")
@@ -162,6 +162,10 @@ func (m RunPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		switch msg.Type {
 		case tea.KeyCtrlC:
+			m.cancelCtx()
+			if err := m.websocketConn.Close(); err != nil {
+				m.Logger.Info("error closing ws")
+			}
 			return m, tea.Quit
 		}
 	case error:
