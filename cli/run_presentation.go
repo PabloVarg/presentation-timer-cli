@@ -27,6 +27,7 @@ type RunPresentation struct {
 	readChannel    <-chan api.RunStatusResponse
 	sendChannel    chan<- api.RunInput
 	lastStatus     api.RunStatusResponse
+	err            error
 }
 
 type connectWsMsg struct {
@@ -66,26 +67,31 @@ func NewRunPresentation(m ProgramModel, ID int) RunPresentation {
 
 func (m RunPresentation) Init() tea.Cmd {
 	cmds := make([]tea.Cmd, 0, 2)
-	cmds = append(cmds, Tick(100*time.Millisecond))
+	cmds = append(cmds, Tick(100*time.Millisecond), m.ConnectWS(0))
+
+	return tea.Batch(cmds...)
+}
+
+func (m RunPresentation) ConnectWS(wait time.Duration) tea.Cmd {
+	if wait != 0 {
+		time.Sleep(wait)
+	}
 
 	ch, send, conn, err := api.ConnectToRun(m.ctx, m.Api, m.Logger, m.presentationID)
 	if err != nil {
-		cmds = append(cmds, func() tea.Msg {
+		return func() tea.Msg {
 			return ConnClosed
-		})
-		return tea.Batch(cmds...)
+		}
 	}
 
-	cmds = append(cmds, func() tea.Msg {
+	return func() tea.Msg {
 		return connectWsMsg{
 			conn: conn,
 			rxCh: ch,
 			txCh: send,
 			err:  err,
 		}
-	})
-
-	return tea.Batch(cmds...)
+	}
 }
 
 func Tick(d time.Duration) tea.Cmd {
@@ -106,6 +112,10 @@ func (m RunPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.sendChannel <- api.RunInput{
 			Action: "status",
+		}
+
+		if errors.Is(m.err, ConnClosed) {
+			m.err = nil
 		}
 
 		cmds = append(cmds, m.WaitForMessage())
@@ -172,6 +182,8 @@ func (m RunPresentation) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case errors.Is(msg, ConnClosed):
 			m.Logger.Info("received", "conn", "closed")
+			m.err = msg
+			cmds = append(cmds, m.ConnectWS(5*time.Second))
 		}
 	}
 
@@ -205,6 +217,10 @@ func (m RunPresentation) View() string {
 		),
 	)
 	sb.WriteString("\n")
+
+	if m.err != nil {
+		sb.WriteString(ErrorStyle.PaddingTop(1).Render(m.err.Error()))
+	}
 
 	return sb.String()
 }
