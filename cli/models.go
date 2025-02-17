@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"log/slog"
 	"time"
 
@@ -144,3 +145,5 @@ func (f *FormModel) UpdateFocus(msg tea.Msg) tea.Cmd {
 func Transition(to tea.Model) (tea.Model, tea.Cmd) {
 	return to, to.Init()
 }
+
+var ConnClosed = errors.New("connection lost")

@@ -15,12 +15,12 @@ type RunStatusResponse struct {
 	Step   Section `json:"step"`
 	MsLeft int64   `json:"ms_left"`
 	// errors
-	Err error `json:"error,omitempty"`
+	Err string `json:"error,omitempty"`
 }
 
 type RunInput struct {
 	Action string `json:"action"`
-	Step   *int32 `json:"step"`
+	Step   *int32 `json:"step,omitempty"`
 }
 
 func ConnectToRun(
@@ -53,6 +53,7 @@ func ConnectToRun(
 
 		for {
 			err := c.ReadJSON(&response)
+			logger.Info("received message", "msg", response, "err", err)
 			if err != nil {
 				return
 			}
@@ -63,12 +64,19 @@ func ConnectToRun(
 
 	in := make(chan RunInput)
 	go func() {
+		defer func() {
+			logger.Info("connet to run", "exit", "write loop")
+		}()
+
 		for {
+			logger.Info("write loop")
 			select {
 			case <-ctx.Done():
 				return
 			case input, ok := <-in:
+				logger.Info("api", "send input", input)
 				if !ok {
+					logger.Info("api close input ch")
 					return
 				}
 

@@ -101,6 +101,13 @@ func (m ListPresentations) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return Transition(NewEditPresentation(m.ProgramModel, item.ID))
 		case "R":
 			cmds = append(cmds, m.retrievePresentations())
+		case "s":
+			item, ok := m.List.SelectedItem().(PresentationItem)
+			if !ok {
+				panic("received unexpected value type")
+			}
+
+			return Transition(NewRunPresentation(m.ProgramModel, item.ID))
 		}
 	}
 
